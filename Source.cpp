@@ -1,340 +1,286 @@
-#define _CRT_SECURE_NO_WARNINGS
+// http://ekmair.ukma.edu.ua/bitstream/handle/123456789/18324/Haldetskyi_Zadacha_komivoiazhera_yak_zadacha_binarnoho_LP.pdf?sequence=1&isAllowed=y
+// https://www.mathros.net.ua/znahodzhennja-rozvjazku-zadachi-komivojazhera-metodom-oserednenyh-koeficijentiv.html
+// https://www.programiz.com/dsa/graph-adjacency-list
+// 
+// !!
+// https://uchimatchast.ru/teoriya/algoritm-littla-primer-1/
+// !! алгоритм Літтла
 
 #include <stdio.h>
 #include <Windows.h>
-#include <string.h>
+#include <limits.h>
+//#define NUMADJ 5
+#define WEIGHT_INT sizeof(int)
 
-#define SIZE 20
-#define LEN 200
+typedef struct AdjacencyListOfVertices {
+	int vertex; // Вершина.
+	int weight;
+	//char edge_turns_in; // 1 - True, 0 - False.
+	AdjacencyListOfVertices* next;
+	//graph* adr_graph;
+} AdjList;
 
+typedef struct {
+	int number;
+	AdjList* ListOfVertices;
+} graph;
 
-typedef struct inform {
-    int index;
-    char date[SIZE];
-} INFORM;
-typedef struct list_two_queue_element {
-    struct list_two_queue_element* previous;
-    INFORM inform;
-    struct list_two_queue_element* next;
-} LSTQ;
-
-typedef struct list_single_stec_element {
-    INFORM inform;
-    struct list_single_stec_element* next;
-} LSTSTC;
-
-LSTQ* listQueue;
-LSTSTC* listStack;
-
-
-void MakeList();
-int NumDayOfYearByDate(char*);
-int MakeStcListFromQ(LSTQ*);
-LSTQ* RemoveElementOfList(LSTQ*);
-void TextDynamicArrOfString();
+graph** firstvertex;
 
 int main() {
-    system("chcp 1251");
+	system("chcp 1251");
 
-    int tst;
-    printf("Виберіть спосіб задання інформації(Зчитування з текстового файлу - 1    Зчитування з консолі - 2): \n");
-    while (true) {
-        scanf("%d", &tst);
-        if (tst == 1)
-            TextDynamicArrOfString();
-        else if (tst == 2)
-            MakeList();
-        else {
-            printf("Введене неправильне значення! Повторіть спробу: ");
-            continue;
-        }
-        break;
-    }
+	// CreateGraph();
+	int Graphnum, NUMADJ_ind = 1;
+	AdjList* last_el, * pList; //
+	graph** pVertex = firstvertex; //
+	firstvertex = (graph**)malloc(sizeof(graph**)); //
+	if (firstvertex == NULL) {
+		printf("Недостатньо вільної пам'яті!\n");
+		return 0;
+	}
+	*firstvertex = NULL;
 
-    LSTQ* pListOper = listQueue;
-    printf("\n\tДані елементів введеного списку: \n");
-    while (pListOper != NULL) {
-        printf("\tІндекс - %d \t Дата: ", pListOper->inform.index);
-        puts(pListOper->inform.date);
-        pListOper = pListOper->next;
-    }
+	for (Graphnum = 0; ; Graphnum++) {
+		if (*firstvertex != NULL) {
+			firstvertex = (graph**)malloc(sizeof(graph**) * (Graphnum + 1));  //
+			if (firstvertex == NULL) {
+				printf("Недостатньо вільної пам'яті!\n");
+				return 0;
+			}
+			for (int i = 0; i < Graphnum; i++)
+				firstvertex[i] = pVertex[i];
 
-    if (MakeStcListFromQ(listQueue) == 0) {
-        return 0;
-    }
+			free(pVertex);
+		}
+		//else
+		//	firstvertex = (graph**)malloc(sizeof(graph**)*(Graphnum + 1)); //
+		pVertex = firstvertex;
 
 
-    LSTSTC* pListOperStack = listStack;
-    printf("\n\tДані елементів створеного списку: \n");
-    while (pListOperStack != NULL) {
-        printf("\tІндекс - %d \t Дата: ", pListOperStack->inform.index);
-        puts(pListOperStack->inform.date);
-        pListOperStack = pListOperStack->next;
-    }
-    pListOper = listQueue;
-    printf("\n\tДані елементів скороченого початкового списку: \n");
-    while (pListOper != NULL) {
-        printf("\tІндекс - %d \t Дата: ", pListOper->inform.index);
-        puts(pListOper->inform.date);
-        pListOper = pListOper->next;
-    }
 
-    pListOper = listQueue;
-    while (listQueue != NULL) {
-        listQueue = listQueue->next;
-        free(pListOper);
-        pListOper = listQueue;
-    }
-    pListOperStack = listStack;
-    while(listStack != NULL){
-        listStack = listStack->next;
-        free(pListOperStack);
-        pListOperStack = listStack;
-    }
-    return 0;
+		pVertex[Graphnum] = (graph*)malloc(sizeof(graph));
+		if (pVertex[Graphnum] == NULL) {
+			printf("Недостатньо вільної пам'яті!\n");
+			return 0;
+		}
+		pVertex[Graphnum]->number = Graphnum;
+
+		printf("Введіть номери вершин, до яких ідуть ребра з вершини #%d: \n\t(-1 - завершення введення даних про вершину, якщо вершина пуста, то завершується введення графа) \n", Graphnum);
+		pList = (AdjList*)malloc(sizeof(AdjList));
+
+		int numAdjGraph, weightGraph;
+
+		printf(" Номер: "); // *
+		scanf_s("%d", &numAdjGraph);
+		//if (numAdjGraph == -1) {
+		//	free(pList);
+		//	//free(pVertex[Graphnum]);
+		//	pVertex[Graphnum]->ListOfVertices = NULL;
+		//	//break;
+		//	continue;
+		//}
+		if (numAdjGraph == -1) {
+			free(pList);
+			free(pVertex[Graphnum]);
+			pVertex[Graphnum] = NULL; //
+			break;
+		}
+		//else if (numAdjGraph == -2) {
+		//	free(pList);
+		//	free(pVertex[Graphnum]);
+		//	pVertex[Graphnum] = NULL; //
+		//	break;
+		//}
+		pList->vertex = numAdjGraph;
+		while (true) {
+			printf(" Вага ребра між вершинами %d та %d: ", Graphnum, numAdjGraph);
+			scanf_s("%d", &weightGraph);
+			if (weightGraph < 1) {
+				printf("Вага графа не може бути меншою ідиниці!\n");
+				continue;
+			}
+			break;
+		}
+		pList->weight = weightGraph;
+
+		last_el = pList; // *
+
+		while (true) {
+			printf(" Номер: ");
+			scanf_s("%d", &numAdjGraph);
+			if (numAdjGraph == -1) {
+				last_el->next = NULL;
+				break;
+			}
+			last_el->next = (AdjList*)malloc(sizeof(AdjList));
+			last_el = last_el->next;
+			last_el->vertex = numAdjGraph;
+			while (true) {
+				printf(" Вага ребра між вершинами %d та %d: ", Graphnum, numAdjGraph);
+				scanf_s("%d", &numAdjGraph);
+				if (numAdjGraph < 1) {
+					printf("Вага графа не може бути меншою ідиниці!\n");
+					continue;
+				}
+				break;
+			}
+			last_el->weight = numAdjGraph;
+		}
+		pVertex[Graphnum]->ListOfVertices = pList;
+	}
+
+	// PrintGraph();
+	puts("");
+	for (int i = 0; i < Graphnum; i++) {
+		pList = firstvertex[i]->ListOfVertices;
+		printf(" Вершина - #%d: \n", firstvertex[i]->number);
+		while (pList != NULL) {
+			printf("\t Суміжна вершина - %d \n\t Вага ребра, яке йде до цієї вершини - %d\n", pList->vertex, pList->weight);
+			pList = pList->next;
+		}
+	}
+
+
+	printf("%d\t%d\t%d\n", sizeof(long int), sizeof(int), sizeof(long long int));
+	// Задача комівояжера:
+
+	/*
+	int key; // Костиль.
+
+	int MinWeight, res = 0, mres = INT_MAX;
+	int* dArr = (int*)malloc(WEIGHT_INT * Graphnum);
+	AdjList* pListMin;
+	pList = firstvertex[0]->ListOfVertices;
+	for (int i = 0; i < Graphnum; i++)
+		dArr[i] = 0;
+	(*dArr)++;
+	while (true) {
+		while (true) {
+			//MinWeight = pList->weight;
+			pListMin = pList;
+			pList = pList->next;
+			while (pList != NULL) {
+				if (dArr[pListMin->vertex] > dArr[pList->vertex]) {
+					pListMin = pList;
+				}
+				else if (pListMin->weight > pList->weight && dArr[pListMin->vertex] == dArr[pList->vertex]) {
+					pListMin = pList;
+					//MinWeight = pList->weight;
+				}
+				pList = pList->next;
+			}
+			res += pListMin->weight;
+			pList = firstvertex[pListMin->vertex]->ListOfVertices;
+			dArr[pListMin->vertex]++;
+
+
+
+
+
+			if (pListMin->vertex == 0) {
+				key = 1;
+				for (int i = 0; i < Graphnum; i++) {
+					if (dArr[i] == 0)
+						key = 0;
+				}
+				if (key == 1)
+					break;
+			}
+		}
+		if (mres > res)
+			mres = res;
+		res = 0;
+	}
+	*/
+
+	// V2 Алгоритм Літтла(Алгоритм Дейкстри для кожної вершини):
+
+	// firstvertex, Graphnum, pVertex, pList.
+
+	int* Arrres = (int*)malloc(WEIGHT_INT * Graphnum);
+	int** dArr = (int**)malloc(WEIGHT_INT * Graphnum);
+	for (int i = 0; i <= Graphnum; i++)
+		dArr[i] = (int*)malloc(WEIGHT_INT * Graphnum);
+
+	for (int i = 0; i < Graphnum; i++) {
+		pList = firstvertex[i]->ListOfVertices;
+		for (int j = 0; j < Graphnum; j++) {
+			dArr[i][j] = 0;
+		}
+		while (pList != NULL) {
+			dArr[i][pList->vertex] = pList->weight;
+			pList = pList->next;
+		}
+	}
+
+	for (int indGr = 0; indGr < Graphnum; indGr++) {
+		pList = firstvertex[indGr]->ListOfVertices;
+
+
+		for (int i = 0; i < Graphnum; i++)
+			Arrres[i] = INT_MAX;
+		while (pList != NULL) {
+			Arrres[pList->vertex] = pList->weight;
+			pList = pList->next;
+		}
+
+		// *
+		for (int i = 0; i < Graphnum; i++) {
+			\
+				for (int j = 0; j < Graphnum; j++)
+					printf("%d  ", dArr[i][j]);
+			puts("\n");
+		}
+		// *
+
+		for (int fromv = 1; fromv < Graphnum + 1; fromv++) { // !!!
+			// *
+			for (int j = 0; j < Graphnum; j++)
+				printf("%d  ", Arrres[j]);
+			puts("\n");
+			// *
+
+			if (fromv - 1 == indGr)
+				continue;
+			for (int tov = 1; tov < Graphnum + 1; tov++) {
+				if (tov - 1 == indGr)
+					continue;
+				if (dArr[fromv - 1][tov - 1] != 0 && (long long int)dArr[fromv - 1][tov - 1] + (long long int)Arrres[fromv - 1] < (long long int)Arrres[tov - 1])
+					Arrres[tov - 1] = dArr[fromv - 1][tov - 1] + Arrres[fromv - 1];
+			}
+		}
+
+
+
+		// *]
+		/*
+		for (int i = 0; i < Graphnum; i++){
+			if (Arrres[i] == INT_MAX)
+				Arrres[i] = 0;
+		}
+		*/
+		// *
+		for (int i = 0; i < Graphnum; i++) // ! 
+			dArr[indGr][i] = Arrres[i];
+	}
+
+	for (int i = 0; i < Graphnum; i++) {
+		for (int j = 0; j < Graphnum; j++)
+			printf("%d  ", dArr[i][j]);
+		puts("\n");
+	}
+
+
+
+	/*pList = (*firstvertex)->ListOfVertices;
+	for (int i = 2; i < Graphnum; i++) {
+		while (pList->vertex < Graphnum) {
+			pList = firstvertex[pList->vertex]->ListOfVertices;
+			if (pList->weight + Arrres[pList->vertex] <
+		}
+	}*/
+
+
+
 }
-
-void MakeList() {
-    static int num = 1;
-    LSTQ* pListOper;
-
-    pListOper = (LSTQ*)malloc(sizeof(LSTQ));
-    if (pListOper == NULL) {
-        puts("\n Недостатньо пам'яті! \n Формування списку завершено!\n");
-        return;
-    }
-    printf("\n #%d елемент: індекс - ", num);
-    scanf_s("%d", &pListOper->inform.index);
-    if (pListOper->inform.index == 0) {
-        free(pListOper);
-        return;
-    }
-    num++;
-
-    rewind(stdin);
-    printf("Введіть дату у форматі дд.мм або дд місяць(21.02 або 21 лютого): \n\t");
-    gets_s(pListOper->inform.date, SIZE);
-    pListOper->next = NULL;
-    pListOper->previous = NULL;
-    listQueue = pListOper;
-
-    LSTQ* last_el = listQueue;
-    while (1) {
-        pListOper = (LSTQ*)malloc(sizeof(LSTQ));
-        if (pListOper == NULL) {
-            puts(" Недостатньо пам'яті! \n Формування списку завершено!\n");
-            return;
-        }
-        printf(" #%d елемент: індекс - ", num);
-        scanf_s("%d", &pListOper->inform.index);
-        if (pListOper->inform.index == 0) {
-            free(pListOper);
-            last_el = NULL;
-            return;
-        }
-        num++;
-
-        rewind(stdin);
-        printf("Введіть дату у форматі дд.мм або дд місяць(21.02 або 21 лютого): \n\t");
-        gets_s(pListOper->inform.date, SIZE);
-        pListOper->next = NULL;
-        last_el->next = pListOper;
-        pListOper->previous = last_el;
-        last_el = pListOper;
-    }
-}
-
-void TextDynamicArrOfString() {
-    FILE* fp_r;
-    LSTQ* pListOperQ,
-        * last_el;
-    char buf[SIZE], fnamescan[LEN], * pOper;
-    const char* fname = "C:\\Stopa. Політехніка\\Labs\\(1)Перший курс\\(2)Другий семестр\\Алгоритмізація та програмування\\Лабораторна 9\\Новий текстовий документ.txt";
-    int index;
-
-    printf("\nВведіть розташування текстового документа з реченнями(пустий рядок - текстовий документ за замовчуванням): \n");
-    rewind(stdin);
-    gets_s(fnamescan, LEN);
-    if ((fp_r = fopen(fnamescan, "rt")) != NULL) // Створюємо потік  для читання, пов'язаний з файлом за адресою fname.
-        fname = fnamescan;
-    else {
-        if ((fp_r = fopen(fname, "rt")) != NULL) {
-            printf("Хибне ім\'я файлу - %s \n", fname); // Створюємо потік  для читання, пов'язаний з файлом за адресою fname_r.
-            return;
-        }
-    }
-
-    pListOperQ = (LSTQ*)malloc(sizeof(LSTQ));
-    if (pListOperQ == NULL) {
-        puts("\n Недостатньо пам'яті! \n Формування списку завершено!\n");
-        return;
-    }
-    if ((fscanf(fp_r, "%d", &pListOperQ->inform.index) == 1)) {
-        if (pListOperQ->inform.index == 0)
-            return;
-
-        fseek(fp_r, 2L, SEEK_CUR);
-        pOper = buf;
-        while (fscanf(fp_r, "%c", pOper) == 1) {
-            if (*pOper == '\n')
-                break;
-            pOper++;
-        }
-        *pOper = '\0';
-
-        strcpy(pListOperQ->inform.date, buf);
-    }
-
-    pListOperQ->next = NULL;
-    pListOperQ->previous = NULL;
-    listQueue = pListOperQ;
-    last_el = listQueue;
-    while ((fscanf(fp_r, "%d", &index) == 1)) {
-        pListOperQ = (LSTQ*)malloc(sizeof(LSTQ));
-        if (pListOperQ == NULL) {
-            puts("\n Недостатньо пам'яті! \n Формування списку завершено!\n");
-            return;
-        }
-        if (index == 0)
-            break;
-
-        pListOperQ->inform.index = index;
-        pOper = buf;
-
-        fseek(fp_r, 2L, SEEK_CUR);
-        while (fscanf(fp_r, "%c", pOper) == 1) {
-            if (*pOper == '\n')
-                break;
-            pOper++;
-        }
-        *pOper = '\0';
-
-        strcpy(pListOperQ->inform.date, buf);
-
-        last_el->next = pListOperQ;
-        pListOperQ->previous = last_el;
-        pListOperQ->next = NULL;
-        last_el = pListOperQ;
-    }
-    fclose(fp_r);
-}
-
-int NumDayOfYearByDate(char* pstr) {
-    const char* months_str[12] = { "січня", "лютого", "березня", "квітня", "травня", "червня",
-                                   "липня", "серпня", "вересня", "жовтня", "листопада", "грудня" },
-        limits[] = " ./,\'\"\\";
-    int months_days[12] = { 31,28,31,30,31,30,31,31,30,31,30,31 },
-        daysOfYear, daysOfYearCopy, monthOfYear, k;
-    char* pOper;
-
-    while (*pstr == ' ')
-        pstr++;
-    if (*pstr > '9' || *pstr < '0') {
-        printf(" Неправильний формат введення дати - %s. \n", pstr);
-        return 0;
-    }
-    daysOfYear = *pstr++ - 48;
-    if (*pstr >= '0' && *pstr <= '9') {
-        daysOfYear *= 10;
-        daysOfYear += *pstr++ - 48;
-    }
-
-    daysOfYearCopy = daysOfYear;
-    for (k = 0; ((pOper = strstr(pstr, months_str[k])) == NULL) && k != 11; k++)
-        daysOfYearCopy += months_days[k];
-    if (strchr(limits, *pstr) == NULL || pOper != pstr + 1 && pOper != NULL) {
-        printf(" Неправильний формат введення дати - %s. \n", pstr);
-        return 0;
-    }
-    pstr++;
-
-    if (pOper == NULL) {
-        daysOfYearCopy = daysOfYear;
-        if (!(*pstr >= '0' && *pstr <= '9')) {
-            printf(" Неправильний формат введення дати - %s. \n", pstr);
-            return 0;
-        }
-        monthOfYear = *pstr++ - 48;
-        if (*pstr >= '0' && *pstr <= '9') {
-            monthOfYear *= 10;
-            monthOfYear += *pstr++ - 48;
-        }
-        if (monthOfYear > 12 || monthOfYear < 1) {
-            puts("Місяць введено неправильно!");
-            return 0;
-        }
-        for (k = 0; k < monthOfYear - 1; k++) {
-            daysOfYearCopy += months_days[k];
-        }
-
-    }
-    if (daysOfYear > months_days[k] || daysOfYear < 1) {
-        puts("День введено неправильно!");
-        return 0;
-    }
-
-    return daysOfYearCopy;
-}
-
-int MakeStcListFromQ(LSTQ* ElementOfQList) {
-    char date1[SIZE], date2[SIZE];
-    int numDaysFir, numDaysSec, ValueOper, k;
-    rewind(stdin);
-    printf("\nВведіть першу дату: ");
-    gets_s(date1);
-    rewind(stdin);
-    printf("Введіть другу дату: ");
-    gets_s(date2);
-    numDaysFir = NumDayOfYearByDate(date1);
-    numDaysSec = NumDayOfYearByDate(date2);
-    if (numDaysFir == 0 || numDaysSec == 0) 
-        return 0;
-    if (numDaysFir > numDaysSec) {
-        ValueOper = numDaysFir;
-        numDaysFir = numDaysSec;
-        numDaysSec = ValueOper;
-    }
-    LSTSTC* pListOper;
-    while (ElementOfQList != NULL) {
-        ValueOper = NumDayOfYearByDate(ElementOfQList->inform.date);
-        if (ValueOper == 0)
-            return 0;
-        if (ValueOper > numDaysFir && ValueOper < numDaysSec) {
-            pListOper = (LSTSTC*)malloc(sizeof(LSTSTC));
-            if (pListOper == NULL) {
-                puts("\n Недостатньо пам'яті! \n Формування списку завершено!\n");
-                return 0;
-            }
-            for (k = 0; ElementOfQList->inform.date[k] != '\0'; k++) {
-                pListOper->inform.date[k] = ElementOfQList->inform.date[k];
-            }
-            pListOper->inform.date[k] = '\0';
-            pListOper->inform.index = ElementOfQList->inform.index;
-            pListOper->next = listStack;
-            listStack = pListOper;
-            ElementOfQList = RemoveElementOfList(ElementOfQList);
-        }
-        else
-            ElementOfQList = ElementOfQList->next;
-    }
-    return 1;
-}
-
-LSTQ* RemoveElementOfList(LSTQ* ElementOfQList) {
-    LSTQ* ElementPrevious = ElementOfQList->previous,
-        * ElementNext = ElementOfQList->next;
-    free(ElementOfQList);
-    if (ElementPrevious == NULL) {
-        ElementNext->previous = NULL;
-        listQueue = ElementNext;
-    }
-    else if (ElementNext == NULL) {
-        ElementPrevious->next = NULL;
-    }
-    else {
-        ElementPrevious->next = ElementNext;
-        ElementNext->previous = ElementPrevious;
-    }
-    return ElementNext;
-}
-

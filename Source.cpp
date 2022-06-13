@@ -128,7 +128,7 @@ int main() {
 	}
 
 
-	printf("%d\t%d\t%d\n", sizeof(long int), sizeof(int), sizeof(long long int));
+
 	// Задача комівояжера:
 
 	/*
@@ -219,22 +219,41 @@ int main() {
 			puts("\n");
 		}
 		// *
+		
+		// fromv < Graphnum + 1
+		for (int fromv = 1 + indGr; ; fromv++) { // !!!
+			if (fromv == Graphnum) {
+				fromv = -1;
+				continue;
+			}
+			if (fromv == indGr) // 
+				break;
 
-		for (int fromv = 1; fromv < Graphnum + 1; fromv++) { // !!!
 			// *
 			for (int j = 0; j < Graphnum; j++)
 				printf("%d  ", Arrres[j]);
 			puts("\n");
 			// *
 
-			if (fromv - 1 == indGr)
-				continue;
-			for (int tov = 1; tov < Graphnum + 1; tov++) {
-				if (tov - 1 == indGr)
+			// tov < Graphnum + 1
+			for (int tov = 1 + indGr; ; tov++) {
+				if (tov == Graphnum) {
+					tov = -1;
 					continue;
-				if (dArr[fromv - 1][tov - 1] != 0 && (long long int)dArr[fromv - 1][tov - 1] + (long long int)Arrres[fromv - 1] < (long long int)Arrres[tov - 1])
-					Arrres[tov - 1] = dArr[fromv - 1][tov - 1] + Arrres[fromv - 1];
+				}
+				if (tov == indGr) // 
+					break;
+
+				if (dArr[fromv][tov] != 0 && (long long int)dArr[fromv][tov] + (long long int)Arrres[fromv] < (long long int)Arrres[tov])
+					Arrres[tov] = dArr[fromv][tov] + Arrres[fromv];
 			}
+			//for (int tov = 0; tov < Graphnum; tov++) {
+			//	if (tov == indGr) // 
+			//		continue;
+
+			//	if (dArr[fromv][tov] != 0 && (long long int)dArr[fromv][tov] + (long long int)Arrres[fromv] < (long long int)Arrres[tov])
+			//		Arrres[tov] = dArr[fromv][tov] + Arrres[fromv];
+			//}
 		}
 
 

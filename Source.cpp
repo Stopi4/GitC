@@ -203,7 +203,6 @@ int main() {
 	for (int indGr = 0; indGr < Graphnum; indGr++) {
 		pList = firstvertex[indGr]->ListOfVertices;
 
-
 		for (int i = 0; i < Graphnum; i++)
 			Arrres[i] = INT_MAX;
 		while (pList != NULL) {
@@ -211,81 +210,29 @@ int main() {
 			pList = pList->next;
 		}
 
-		// *
-		for (int i = 0; i < Graphnum; i++) {
-			
-				for (int j = 0; j < Graphnum; j++)
-					printf("%d  ", dArr[i][j]);
-			puts("\n");
-		}
-		// *
-		
-		// fromv < Graphnum + 1
-		for (int fromv = 1 + indGr; ; fromv++) { // !!!
+		for (int fromv = 1 + indGr; fromv != indGr; fromv++) {
 			if (fromv == Graphnum) {
 				fromv = -1;
 				continue;
 			}
-			if (fromv == indGr) // 
-				break;
-
-			// *
-			for (int j = 0; j < Graphnum; j++)
-				printf("%d  ", Arrres[j]);
-			puts("\n");
-			// *
-
-			// tov < Graphnum + 1
-			for (int tov = 1 + indGr; ; tov++) {
-				if (tov == Graphnum) {
-					tov = -1;
-					continue;
-				}
+			for (int tov = 0; tov < Graphnum; tov++) {
 				if (tov == indGr) // 
-					break;
+					continue;
 
 				if (dArr[fromv][tov] != 0 && (long long int)dArr[fromv][tov] + (long long int)Arrres[fromv] < (long long int)Arrres[tov])
 					Arrres[tov] = dArr[fromv][tov] + Arrres[fromv];
 			}
-			//for (int tov = 0; tov < Graphnum; tov++) {
-			//	if (tov == indGr) // 
-			//		continue;
-
-			//	if (dArr[fromv][tov] != 0 && (long long int)dArr[fromv][tov] + (long long int)Arrres[fromv] < (long long int)Arrres[tov])
-			//		Arrres[tov] = dArr[fromv][tov] + Arrres[fromv];
-			//}
 		}
-
-
-
-		// *]
-		/*
-		for (int i = 0; i < Graphnum; i++){
-			if (Arrres[i] == INT_MAX)
-				Arrres[i] = 0;
-		}
-		*/
-		// *
-		for (int i = 0; i < Graphnum; i++) // ! 
+		for (int i = 0; i < Graphnum; i++) 
 			dArr[indGr][i] = Arrres[i];
 	}
 
+
+	//
 	for (int i = 0; i < Graphnum; i++) {
 		for (int j = 0; j < Graphnum; j++)
 			printf("%d  ", dArr[i][j]);
 		puts("\n");
 	}
-
-
-
-	/*pList = (*firstvertex)->ListOfVertices;
-	for (int i = 2; i < Graphnum; i++) {
-		while (pList->vertex < Graphnum) {
-			pList = firstvertex[pList->vertex]->ListOfVertices;
-			if (pList->weight + Arrres[pList->vertex] <
-		}
-	}*/
-
-
-
+	//
 }

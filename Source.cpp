@@ -70,28 +70,14 @@ int main() {
 		pList = (AdjList*)malloc(sizeof(AdjList));
 
 		int numAdjGraph, weightGraph;
-
 		printf(" Номер: "); // *
 		scanf_s("%d", &numAdjGraph);
-		//if (numAdjGraph == -1) {
-		//	free(pList);
-		//	//free(pVertex[Graphnum]);
-		//	pVertex[Graphnum]->ListOfVertices = NULL;
-		//	//break;
-		//	continue;
-		//}
 		if (numAdjGraph == -1) {
 			free(pList);
 			free(pVertex[Graphnum]);
 			pVertex[Graphnum] = NULL; //
 			break;
 		}
-		//else if (numAdjGraph == -2) {
-		//	free(pList);
-		//	free(pVertex[Graphnum]);
-		//	pVertex[Graphnum] = NULL; //
-		//	break;
-		//}
 		pList->vertex = numAdjGraph;
 		while (true) {
 			printf(" Вага ребра між вершинами %d та %d: ", Graphnum, numAdjGraph);
@@ -227,7 +213,7 @@ int main() {
 
 		// *
 		for (int i = 0; i < Graphnum; i++) {
-			\
+			
 				for (int j = 0; j < Graphnum; j++)
 					printf("%d  ", dArr[i][j]);
 			puts("\n");

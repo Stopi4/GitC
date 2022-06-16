@@ -1,0 +1,6 @@
+﻿  Source.cpp
+C:\Stopa. Політехніка\VS.StopaNYLP.Code\(1)Перший курс\(2)Другий семестр\GitC\GitC\Source.cpp(235,6): warning C4101: 'last_el_i': unreferenced local variable
+C:\Stopa. Політехніка\VS.StopaNYLP.Code\(1)Перший курс\(2)Другий семестр\GitC\GitC\Source.cpp(236,6): warning C4101: 'prelast_el_i': unreferenced local variable
+C:\Stopa. Політехніка\VS.StopaNYLP.Code\(1)Перший курс\(2)Другий семестр\GitC\GitC\Source.cpp(235,17): warning C4101: 'last_el_j': unreferenced local variable
+C:\Stopa. Політехніка\VS.StopaNYLP.Code\(1)Перший курс\(2)Другий семестр\GitC\GitC\Source.cpp(236,20): warning C4101: 'prelast_el_j': unreferenced local variable
+  GitC.vcxproj -> C:\Stopa. Політехніка\VS.StopaNYLP.Code\(1)Перший курс\(2)Другий семестр\GitC\x64\Debug\GitC.exe
